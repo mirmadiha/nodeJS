@@ -6,7 +6,7 @@ const server=http.createServer((req,res)=>{
     if(url==='/'){
     res.write('<html>')
     res.write('<header><title>My first page</title></header>');
-    res.write('<body><h1>hello from other route!</h1></body>')
+    res.write('<body>form action="/message"method="POST"<input type="text"><button type="submit">Send</button></input></body>')
     res.write('</html>')
     res.end();
     }
