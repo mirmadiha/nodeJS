@@ -8,13 +8,23 @@ const server=http.createServer((req,res)=>{
     if(url==='/'){
     res.write('<html>')
     res.write('<header><title>My first page</title></header>');
-    res.write('<body><form action="/message" method="POST"><input type="text"><button type="submit">Send</button></form></body>')
+    res.write('<body><form action="/message" method="POST"><input type="text" name="message"><button type="submit">Send</button></form></body>')
     res.write('</html>')
     return res.end();
     }
 
     if(url==='/message' && method==='POST'){
-        fs.writeFileSync("message.txt","DUMMY");
+        const body=[];
+        req.on('data',(chunk)=>{
+            console.log(chunk);
+            body.push(chunk);
+        });
+        req.on('end',()=>{
+            const parsedBody=Buffer.concat(body).toString();
+            console.log(parsedBody);
+            const message=parsedBody.split('=')[1];
+            fs.writeFileSync("message.txt",message);
+        });
         res.statusCode=302;
         res.setHeader('Location','/');
         return res.end();
@@ -26,4 +36,4 @@ const server=http.createServer((req,res)=>{
     res.write('</html>')
     res.end();
 });
-server.listen(4000);
+server.listen(3000);
