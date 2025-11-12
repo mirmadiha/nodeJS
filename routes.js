@@ -34,4 +34,7 @@ if(url==='/'){
     res.write('</html>')
     res.end();
 }
-module.exports=requestHandler;
+module.exports={
+    handler:requestHandler,
+    someText:'some hard coded text'
+};
