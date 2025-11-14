@@ -1,8 +1,17 @@
 const http=require("http");
 
-const routes=require("./routes");  //imports routes.js
+const express=require("express");
 
-console.log(routes.someText);
+const app=express();
 
-const server=http.createServer(routes.handler);
+app.use((req,res,next)=>{
+    console.log("in the middleware!");
+    next();
+});
+
+app.use((req,res,next)=>{
+    console.log("in  another middleware!");
+});
+
+const server=http.createServer(app);
 server.listen(4000);
