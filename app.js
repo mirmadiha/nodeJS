@@ -11,6 +11,8 @@ app.use((req,res,next)=>{
 
 app.use((req,res,next)=>{
     console.log("in  another middleware!");
+    //res.setHeader() : manually setting header
+    res.send("Hello from node js");
 });
 
 const server=http.createServer(app);
