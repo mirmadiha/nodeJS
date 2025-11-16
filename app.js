@@ -11,18 +11,17 @@ const shopRoutes=require('./routes/shop');
 
 app.use(bodyParser.urlencoded({extended:false}));
 
-app.use(adminRoutes);
+app.use("/admin",adminRoutes);
 
-app.use(shopRoutes);
+ app.get("/",(req,res,next)=>{
+    console.log("in the middleware");
+    res.send("<h1>This is homepage</h1>")
+});
 
 app.use((req,res,next)=>{
     res.status(404).send("<h1>Page not found</h1>");
 })
 
- app.use("/",(req,res,next)=>{
-    console.log("in the middleware");
-    res.send("<h1>This is homepage</h1>")
-});
 
 
 const server=http.createServer(app);
