@@ -8,7 +8,10 @@ const bodyParser=require("body-parser");
 
 const app=express();
 
-app.set("view engine","pug");
+const expressHbs=require('express-handlebars');
+
+app.engine('hbs', expressHbs());
+app.set("view engine","hbs");
 app.set('views','views');
 
 const adminData=require('./routes/admin');
