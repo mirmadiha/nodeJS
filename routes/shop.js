@@ -3,7 +3,7 @@ const express=require("express");
 const path=require("path");
 
 const shopController=require('../controllers/shop')
-const adminController=require('../controllers/shop')
+const adminController=require('../controllers/admin')
 
 const router=express.Router();
 
@@ -13,7 +13,9 @@ router.get('/cart',shopController.getCart);
 
 router.get('/products',shopController.getProducts);
 
-router.get('/cart',shopController.getOrders);
+router.get('/products/:productId',shopController.getProduct);
+
+router.get('/orders',shopController.getOrders);
 
 router.get('/checkout',shopController.getCheckout);
 

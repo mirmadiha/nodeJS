@@ -16,6 +16,7 @@ const shopRoutes=require('./routes/shop');
 const errorControllers=require('./controllers/error');
 
 app.use(bodyParser.urlencoded({extended:false}));
+
 app.use(express.static(path.join(__dirname,'public')));
 
 app.use("/admin",adminRoutes);
