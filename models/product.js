@@ -2,6 +2,7 @@ const fs=require('fs');
 const path=require('path');
 
 const p=path.join(path.dirname(require.main.filename),'data','products.json');
+
 const getProductsFromFile= cb =>{
     fs.readFile(p,(err,fileContent)=>{
         if(err){
@@ -42,6 +43,18 @@ module.exports=class Product{
         }
 
         })
+    }
+
+    static deleteById(id,cb){
+        getProductsFromFile(products=>{
+            const updatedProducts=products.filter((p)=>p.id!==id);
+            fs.writeFile(p,JSON.stringify(updatedProducts),(err)=>{
+                if(err){
+                console.log(err);
+                }
+                cb();
+            })
+        }) 
     }
 
     static fetchAll(cb){
