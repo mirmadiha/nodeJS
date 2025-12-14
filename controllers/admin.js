@@ -50,10 +50,18 @@ exports.postAddProduct=((req,res,next)=>{
     res.redirect('/');
 });
 
+exports.postDeleteProduct=((req,res,next)=>{
+    const prodId = req.body.productId;
+    Product.deleteById(prodId, ()=>{
+        res.redirect('/')
+    }
+    );
+})
+
 exports.getEditProduct=((req,res,next)=>{
     const editMode=req.query.edit;
     if(!editMode){
-        return res.redirect('/');
+        return res.redirect('/products');
     }
     const prodId=req.params.productId;
     Product.findById(prodId,product=>{
