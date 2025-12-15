@@ -6,6 +6,7 @@ const p=path.join(path.dirname(require.main.filename),
 );
 
 module.exports=class Cart{
+
     static addProduct(id,productPrice){
 
         //fetch the previous cart
@@ -40,5 +41,24 @@ module.exports=class Cart{
         })
     })
 
+    }
+
+    static deleteProduct(id,productPrice){
+        fs.readFile(p,(err,fileContent)=>{
+            if(err){
+                return;
+            }
+            const updatedCart={...JSON.parse(fileContent.toString())};
+            const product=updatedCart.products.find(prod=>prod.id===id);
+            updatedCart.products = updatedCart.products.filter(prod=>prod.id!==id);
+            const productQty=product.qty;
+            updatedCart.totalPrice= updatedCart.totalPrice - (productPrice*productQty);
+
+            fs.writeFile(p,JSON.stringify(updatedCart),(err)=>{
+                if(err){
+                    console.log(err);
+                }
+            })
+        })
     }
 }
