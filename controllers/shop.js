@@ -27,15 +27,16 @@ exports.getCart=((req,res,next)=>{
     Cart.getCart(cart=>{
         Product.fetchAll(products=>{
             const cartProducts=[];
-            for(product of products){
+            for (product of products){
                 const cartProductData=cart.products.find(prod => prod.id === product.id);
-                if(cart.products.find(prod => prod.id === product.id)){
-                    cartProducts.push({productData: product, qty:cartProductData.quantity});
+                if(cartProductData){
+                    cartProducts.push({productData: product, qty:cartProductData.qty});
                 }
             }
         res.render('shop/cart',{
             path:'/cart',
-            pageTitle:"Your cart"
+            pageTitle:"Your cart",
+            products: cartProducts
         })
 
         })
