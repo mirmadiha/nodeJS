@@ -67,12 +67,11 @@ exports.getCheckout=((req,res,next)=>{
 })
 
 exports.getIndex=((req,res,next)=>{
-    Product.fetchAll((products)=>{
+    Product.fetchAll().then().catch(err=>console.log(err));
         res.render('shop/index',{
             prods:products,
             pageTitle:'Shop',
             path: '/'
-        });
     });
 });
 
