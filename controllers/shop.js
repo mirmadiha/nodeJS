@@ -1,26 +1,30 @@
 const Product=require('../models/product')
 const Cart=require('../models/cart')
+const db=require('../util/database');
 
 
  exports.getProducts=((req,res,next)=>{
-    Product.fetchAll((products)=>{
+    Product.fetchAll()
+    .then(([rows, fieldData])=>{
         res.render('shop/product-list',
-            {prods:products, 
+            {prods: rows, 
             pageTitle:'All Products',
             path: '/products',
-            hasProducts: products.length>0,
+            hasProducts: rows.length>0,
             activeShop: true,
             productCSS: true
         });
-    });
-    
+    })
+    .catch((err)=>console.log(err));
 });
 
 exports.getProduct=((req,res,next)=>{
     const prodId=req.params.productId;
-    Product.findById(prodId,product=>{
+    Product.findById(prodId)
+    .then(([product])=>{ 
         res.render('shop/product-detail',{product:product, pageTitle:product.title, path: '/products'});
     })
+    .catch(err=>console.log(err))
 })
 
 exports.getCart=((req,res,next)=>{
@@ -67,12 +71,16 @@ exports.getCheckout=((req,res,next)=>{
 })
 
 exports.getIndex=((req,res,next)=>{
-    Product.fetchAll().then().catch(err=>console.log(err));
+    Product.fetchAll()
+    .then(([rows, fieldData])=>{
         res.render('shop/index',{
-            prods:products,
+            prods: rows,
             pageTitle:'Shop',
             path: '/'
-    });
+        });
+    })
+    .catch(err=>console.log(err));
+        
 });
 
 exports.getOrders=((req,res,next)=>{
