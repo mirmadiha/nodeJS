@@ -16,9 +16,7 @@ app.set('views','views');
 
 const adminRoutes=require('./routes/admin');
 const shopRoutes=require('./routes/shop');
-db.execute('SELECT * FROM products ')
-.then((result)=>{console.log(result)})
-.catch((err)=>{console.log(err)});
+
 
 app.use(bodyParser.urlencoded({extended:false}));
 
@@ -31,7 +29,8 @@ app.use(shopRoutes);
 app.use(errorControllers.get404);
 
 sequelize.sync().then(result=>{
-    console.log(result);
+    // console.log(result);
+    console.log("created product")
 })
 .catch(err=>console.log(err));
 
