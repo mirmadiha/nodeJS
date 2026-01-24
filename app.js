@@ -8,6 +8,8 @@ const bodyParser=require("body-parser");
 
 const errorControllers=require('./controllers/error');
 const sequelize=require('./util/database');
+const Product = require('./models/product');
+const User = require('./models/user');
 
 const app=express();
 
@@ -16,6 +18,7 @@ app.set('views','views');
 
 const adminRoutes=require('./routes/admin');
 const shopRoutes=require('./routes/shop');
+const { constants } = require("buffer");
 
 
 app.use(bodyParser.urlencoded({extended:false}));
@@ -27,6 +30,9 @@ app.use("/admin",adminRoutes);
 app.use(shopRoutes);
 
 app.use(errorControllers.get404);
+
+Product.belongsTo(User,{constraints:true, onDelete:'CASCADE'});
+User.hasMany(Product);
 
 sequelize.sync().then(result=>{
     // console.log(result);
