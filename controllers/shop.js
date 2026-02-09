@@ -41,23 +41,39 @@ exports.getProduct=((req,res,next)=>{
 })
 
 exports.getCart=((req,res,next)=>{
-    Cart.getCart(cart=>{
-        Product.fetchAll(products=>{
-            const cartProducts=[];
-            for (product of products){
-                const cartProductData=cart.products.find(prod => prod.id === product.id);
-                if(cartProductData){
-                    cartProducts.push({productData: product, qty:cartProductData.qty});
-                }
-            }
-        res.render('shop/cart',{
+    // console.log(req.user.cart);   //this will return undefind as 'cart' not a property
+    req.user
+    .getCart()
+    .then(cart=>{
+        return cart.getProducts()
+        .then(products=>{
+            res.render('shop/cart',{
             path:'/cart',
             pageTitle:"Your cart",
-            products: cartProducts
+            products: products
+            })
         })
-
-        })
+        .catch(err=>console.log(err));
     })
+    .catch(err=>console.log(err));
+
+    // Cart.getCart(cart=>{
+    //     Product.fetchAll(products=>{
+    //         const cartProducts=[];
+    //         for (product of products){
+    //             const cartProductData=cart.products.find(prod => prod.id === product.id);
+    //             if(cartProductData){
+    //                 cartProducts.push({productData: product, qty:cartProductData.qty});
+    //             }
+    //         }
+    //     res.render('shop/cart',{
+    //         path:'/cart',
+    //         pageTitle:"Your cart",
+    //         products: cartProducts
+    //     })
+
+    //     })
+    // })
 })
 
 exports.postCart=((req,res,next)=>{
