@@ -7,7 +7,7 @@ const mongoConnect=(callback)=>{
     MongoClient.connect('mongodb+srv://mirmadihaaijaz_db_user:dbMadiha123@cluster0.xsaikfm.mongodb.net/?appName=Cluster0')
     .then(client=>{
         console.log("connected");
-        db=client.db();
+        _db=client.db();
         callback();
     })
     .catch(err=>{
