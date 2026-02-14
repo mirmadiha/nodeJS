@@ -1,29 +1,29 @@
-const http=require("http");
+const http = require("http");
 
-const path=require("path");
+const path = require("path");
 
-const express=require("express");
+const express = require("express");
 
-const bodyParser=require("body-parser");
+const bodyParser = require("body-parser");
 
-const errorControllers=require('./controllers/error');
-const mongoConnect=require('./util/database').mongoConnect;
+const errorControllers = require('./controllers/error');
+const mongoConnect = require('./util/database').mongoConnect;
 
-const app=express();
+const app = express();
 
-app.set("view engine","ejs");
-app.set('views','views');
+app.set("view engine", "ejs");
+app.set('views', 'views');
 
-const adminRoutes=require('./routes/admin');
-// const shopRoutes=require('./routes/shop');
+const adminRoutes = require('./routes/admin');
+const shopRoutes = require('./routes/shop');
 const { constants } = require("buffer");
 
 
-app.use(bodyParser.urlencoded({extended:false}));
+app.use(bodyParser.urlencoded({ extended: false }));
 
-app.use(express.static(path.join(__dirname,'public')));
+app.use(express.static(path.join(__dirname, 'public')));
 
-app.use((req,res, next)=>{
+app.use((req, res, next) => {
     // User.findByPk(1)
     // .then(user=>{
     //     req.user = user;
@@ -33,11 +33,11 @@ app.use((req,res, next)=>{
     next();
 })
 
-app.use("/admin",adminRoutes);
-// app.use(shopRoutes);
+app.use("/admin", adminRoutes);
+app.use(shopRoutes);
 
 app.use(errorControllers.get404);
 
-mongoConnect(()=>{
+mongoConnect(() => {
     app.listen(4000);
 });
