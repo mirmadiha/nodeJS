@@ -1,3 +1,4 @@
+const mongodb = require('mongodb');
 const getDb = require('../util/database').getDb;
 
 class Product {
@@ -29,6 +30,19 @@ class Product {
         //find().toArray() returns a promise
         //find() gets all products we can filter too if needed 
         //it doesnt return immediately a promise but a cursor(an obkecct provided by mongo db)
+    }
+
+    static findById(prodId) {
+        console.log(prodId);
+        const db = getDb();
+        return db.collection('products').find({ _id: new mongodb.ObjectId(prodId)})
+            .next()
+            .then(product => {
+                console.log(product);
+                return product;
+            })
+            .catch(err => console.log(err));
+
     }
 };
 
