@@ -45,15 +45,12 @@ exports.getCart = ((req, res, next) => {
     // console.log(req.user.cart);   //this will return undefind as 'cart' not a property
     req.user
         .getCart()
-        .then(cart => {
-            return cart.getProducts()
-                .then(products => {
-                    res.render('shop/cart', {
-                        path: '/cart',
-                        pageTitle: "Your cart",
-                        products: products
-                    })
-                })
+        .then(products => {
+            res.render('shop/cart', {
+                path: '/cart',
+                pageTitle: "Your cart",
+                products: products
+            })
                 .catch(err => console.log(err));
         })
         .catch(err => console.log(err));
@@ -85,6 +82,7 @@ exports.postCart = (req, res, next) => {
         })
         .then(result => {
             console.log(result);
+            res.redirect('/cart');
         })
         .catch(err => console.log(err))
     // let fetchedCart;
