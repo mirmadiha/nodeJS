@@ -156,7 +156,7 @@ exports.getIndex = ((req, res, next) => {
 
 exports.getOrders = ((req, res, next) => {
     req.user
-        .getOrders({ include: ['products'] }) //also fetch related products
+        .getOrders()
         .then(orders => {
             res.render('shop/orders', {
                 path: '/orders',
