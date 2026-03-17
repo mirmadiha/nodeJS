@@ -18,6 +18,7 @@ app.set('views', 'views');
 const adminRoutes = require('./routes/admin');
 const shopRoutes = require('./routes/shop');
 const { constants } = require("buffer");
+const mongoose = require('mongoose');
 
 
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -38,6 +39,8 @@ app.use(shopRoutes);
 
 app.use(errorControllers.get404);
 
-mongoConnect(() => {
-    app.listen(4000);
-});
+mongoose.connect('mongodb+srv://mirmadihaaijaz_db_user:Madiha@3711@cluster0.xsaikfm.mongodb.net/')
+    .then(result => {
+        app.listen(3000);
+    })
+    .catch(err => console.log(err));
