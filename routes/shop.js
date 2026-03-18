@@ -7,13 +7,13 @@ const adminController = require('../controllers/admin')
 
 const router = express.Router();
 
-// router.get('/', shopController.getIndex);
+router.get('/', shopController.getIndex);
 
 // router.get('/cart', shopController.getCart);
 
 // router.post('/cart', shopController.postCart);
 
-// router.get('/products', shopController.getProducts);
+router.get('/products', shopController.getProducts);
 
 // router.post('/cart-delete-item', shopController.postCartDeleteProduct);
 
