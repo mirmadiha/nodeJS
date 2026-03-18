@@ -7,8 +7,8 @@ const express = require("express");
 const bodyParser = require("body-parser");
 
 const errorControllers = require('./controllers/error');
-const mongoConnect = require('./util/database').mongoConnect;
-const User = require('./models/user');
+// const mongoConnect = require('./util/database').mongoConnect;
+// const User = require('./models/user');
 
 const app = express();
 
@@ -25,21 +25,21 @@ app.use(bodyParser.urlencoded({ extended: false }));
 
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.use((req, res, next) => {
-    User.findById('69956d27c0ce1c7beeb8786b')
-        .then(user => {
-            req.user = new User(user.name, user.email, user.cart, user._id);
-            next();
-        })
-        .catch(err => console.log(err));
-})
+// app.use((req, res, next) => {
+//     User.findById('69956d27c0ce1c7beeb8786b')
+//         .then(user => {
+//             req.user = new User(user.name, user.email, user.cart, user._id);
+//             next();
+//         })
+//         .catch(err => console.log(err));
+// })
 
 app.use("/admin", adminRoutes);
 app.use(shopRoutes);
 
 app.use(errorControllers.get404);
 
-mongoose.connect('mongodb+srv://mirmadihaaijaz_db_user:Madiha@3711@cluster0.xsaikfm.mongodb.net/')
+mongoose.connect('mongodb+srv://mirmadihaaijaz_db_user:dbMadiha123@cluster0.xsaikfm.mongodb.net/shop')
     .then(result => {
         app.listen(3000);
     })
