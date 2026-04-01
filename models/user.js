@@ -11,7 +11,10 @@ const UserSchema = new mongoose.Schema({
         required: true
     },
     cart: {
-        items: [{ productId: { type: Schema.Types.ObjectId, required: true }, quantity: { type: Number, required: true } }]
+        items: [{
+            productId: { type: Schema.Types.ObjectId, ref: 'Product', required: true },  // ref tells Mongoose where to look when using .populate() to get full product details
+            quantity: { type: Number, required: true }
+        }]
     }
 })
 module.exports = mongoose.model('User', UserSchema)
