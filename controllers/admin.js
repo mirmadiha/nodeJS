@@ -40,7 +40,11 @@ exports.postEditProduct = ((req, res, next) => {
 
 exports.getProducts = ((req, res, next) => {
     Product.find()
+        .select('title price -_id')  // select() specifies which fields to include in the result. Here we only want the title and price, and we exclude the _id field.
+        .populate('userId', 'name')  // populate() replaces the userId ObjectId reference with the actual User document from the DB
+        //with name as second argument we only get the name of the user
         .then(products => {
+            console.log(products);
             res.render('admin/products', {
                 prods: products,
                 pageTitle: 'Admin Products',
