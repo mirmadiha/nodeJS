@@ -20,17 +20,6 @@ exports.getProducts = ((req, res, next) => {
 
 exports.getProduct = ((req, res, next) => {
     const prodId = req.params.productId;
-    // Product.findAll({where: {id: prodId}})
-    // .then(products=>{
-    //     res.render('shop/product-detail',{
-    //         product:product,
-    //         pageTitle:product.title, 
-    //         path: '/products'
-    //     });
-    // })
-    // .catch(err=>{
-    //     console.log(err);
-    // })
     Product.findById(prodId)
         .then((product) => {
             res.render('shop/product-detail', {
@@ -45,8 +34,9 @@ exports.getProduct = ((req, res, next) => {
 exports.getCart = ((req, res, next) => {
     // console.log(req.user.cart);   //this will return undefind as 'cart' not a property
     req.user
-        .getCart()
-        .then(products => {
+        .populate('cart.items.productId')
+        .then(user => {
+            const products = user.cart.items;
             res.render('shop/cart', {
                 path: '/cart',
                 pageTitle: "Your cart",
