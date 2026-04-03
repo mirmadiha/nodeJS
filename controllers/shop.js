@@ -167,8 +167,8 @@ exports.getIndex = ((req, res, next) => {
 });
 
 exports.getOrders = ((req, res, next) => {
-    req.user
-        .getOrders()
+    Order.find({ 'user.userId': req.user._id })
+        //    path in Order schema  :  logged in user's ID
         .then(orders => {
             res.render('shop/orders', {
                 path: '/orders',
