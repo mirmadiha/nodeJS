@@ -142,8 +142,9 @@ exports.postOrder = (req, res, next) => {
                 }
             })
             order.save()
-            req.user.cart.items = [];
-            req.user.save();
+        })
+        .then(result => {
+            return req.user.clearCart();
         })
         .then(result => {
             res.redirect('/orders');
