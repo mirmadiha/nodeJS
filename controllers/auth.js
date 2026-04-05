@@ -1,4 +1,8 @@
 exports.getLogin = ((req, res, next) => {
+    console.log(req.get('Cookie')
+        .trim()
+        .split('=')[1]
+    );
     res.render('auth/login', {
         path: '/login',
         pageTitle: 'Login',
@@ -8,10 +12,7 @@ exports.getLogin = ((req, res, next) => {
 
 
 exports.postLogin = ((req, res, next) => {
-    req.isLoggedIn = true;  //setting it to true for now but issue is it will be true for all users
-    // after res.redirect() the request is over and the response is sent to the client
-    //solution is to use sessions or cookies because they are stored on the server and this data is sent with every request
-
+    res.setHeader('Set-Cookie', 'loggedIn=true');
     res.redirect('/');
 })
 
