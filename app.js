@@ -18,11 +18,25 @@ const adminRoutes = require('./routes/admin');
 const shopRoutes = require('./routes/shop');
 const authRoutes = require('./routes/auth')
 const mongoose = require('mongoose');
+const session = require('express-session');
+const MongoDBStore = require('connect-mongodb-session')(session);
 
+
+const MONGODB_URI = 'mongodb+srv://mirmadihaaijaz_db_user:dbMadiha123@cluster0.xsaikfm.mongodb.net/shop';
+
+
+const store = new MongoDBStore({
+    uri: MONGODB_URI,
+    collection: 'sessions'
+});
 
 app.use(bodyParser.urlencoded({ extended: false }));
 
 app.use(express.static(path.join(__dirname, 'public')));
+
+app.use(
+    session({ secret: 'mysecret', resave: false, saveUninitialized: false, store: store })
+);
 
 app.use((req, res, next) => {
     User.findById('69bcd87843a94d7cbbfa9751')
@@ -39,7 +53,9 @@ app.use(authRoutes);
 
 app.use(errorControllers.get404);
 
-mongoose.connect('mongodb+srv://mirmadihaaijaz_db_user:dbMadiha123@cluster0.xsaikfm.mongodb.net/shop')
+mongoose.connect(
+    MONGODB_URI
+)
     .then(result => {
         User.findOne().then(user => {
             if (!user) {
