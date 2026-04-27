@@ -162,7 +162,7 @@ exports.getIndex = ((req, res, next) => {
                 prods: products,
                 pageTitle: 'Shop',
                 path: '/',
-                isAuthenticated: req.isLoggedIn
+                isAuthenticated: req.session.isLoggedIn
             });
         })
         .catch(err => {
@@ -178,7 +178,7 @@ exports.getOrders = ((req, res, next) => {
                 path: '/orders',
                 pageTitle: 'your Orders',
                 orders: orders,
-                isAuthenticated: req.isLoggedIn
+                isAuthenticated: req.session.isLoggedIn
             });
         })
         .catch(err => console.log(err));
