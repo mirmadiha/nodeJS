@@ -44,7 +44,8 @@ exports.getSignup = (req, res, next) => {
             email: '',
             password: '',
             confirmPassword: ''
-        }
+        },
+        validationErrors: []
     });
 };
 
@@ -68,7 +69,7 @@ exports.postLogin = (req, res, next) => {
                 req.flash('error', 'Invalid email or password!');
                 return res.redirect('/login');
             }
-        return bcrypt
+        bcrypt
         .compare(password, user.password)
         .then(doMatch => {
             if (doMatch) {
@@ -105,12 +106,13 @@ exports.postSignup = (req, res, next) => {
                 email: email,
                 password: password,
                 confirmPassword: confirmPassword
-            }
+            },
+            validationErrors: errors.array()
         })
     }
 
 
-    return bcrypt.hash(password, 12)
+    bcrypt.hash(password, 12)
         .then(hashedPassword => {
             const user = new User({
                 email: email,
