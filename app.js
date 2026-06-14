@@ -60,9 +60,10 @@ const fileFilter = (req, file, cb) => {
 };
 
 app.use(bodyParser.urlencoded({ extended: false }));
-app.use(multer({ storage: fileStorage, fileFilter: fileFilter }).single('image')); 
+app.use(multer({ storage: fileStorage, fileFilter: fileFilter }).single('image'));
 
 app.use(express.static(path.join(__dirname, 'public')));
+app.use('/images', express.static(path.join(__dirname, 'images')));
 
 app.use(
     session({ secret: 'mysecret', resave: false, saveUninitialized: false, store: store })
@@ -83,14 +84,14 @@ app.use((req, res, next) => {
     }
     User.findById(req.session.user._id)
         .then(user => {
-            if(!user){
+            if (!user) {
                 return next();
             }
             req.user = user;
             next();
         })
-        .catch(err =>{
-            next (new Error(err));
+        .catch(err => {
+            next(new Error(err));
         });
 })
 
@@ -102,7 +103,7 @@ app.get('/500', errorControllers.get500);
 
 app.use(errorControllers.get404);
 
-app.use((error, req, res, next)=>{
+app.use((error, req, res, next) => {
     res.status(500).render("500", {
         pageTitle: 'Error',
         path: '/500',
