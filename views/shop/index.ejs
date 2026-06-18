@@ -34,32 +34,10 @@
                             </article>
                             <% } %>
                     </div>
-                    <section class="pagination">
-                        <% if(currentPage !==1 && prevPage !==1){ %>
-                            <a href="/?page=1">1</a>
+                    <%- include('../includes/pagination.ejs', {currentPage: currentPage, hasPrevPage: hasPrevPage,
+                        prevPage: prevPage, hasNextPage: hasNextPage, nextPage: nextPage, lastPage: lastPage}) %>
+                        <% } else { %>
+                            <h1>No Products Found!</h1>
                             <% } %>
-                                <% if(hasPrevPage){ %>
-                                    <a href="/?page=<%= prevPage %>">
-                                        <%= prevPage %>
-                                    </a>
-                                    <% } %>
-                                        <a href="/?page=<%= currentPage %>">
-                                            <%= currentPage %>
-                                        </a>
-                                        <% if(hasNextPage){ %>
-                                            <a href="/?page=<%= nextPage %>">
-                                                <%= nextPage %>
-                                            </a>
-                                            <% } %>
-                                                <% if(lastPage !==currentPage && nextPage !==lastPage){ %>
-                                                    <a href="/?page=<%= lastPage %>">
-                                                        <%= lastPage %>
-                                                    </a>
-                                                    <% } %>
-
-                    </section>
-                    <% } else { %>
-                        <h1>No Products Found!</h1>
-                        <% } %>
             </main>
             <%- include('../includes/end.ejs') %>
