@@ -4,5 +4,4 @@ node_modules/
 # Application logs & dynamic invoice files
 access.log
 data/invoices/
-images/
 ssl/
