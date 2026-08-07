@@ -24,6 +24,12 @@ const orderSchema = new mongoose.Schema({
             ref: 'User',
             required: true
         }
+    },
+    razorpayOrderId: {
+        type: String
+    },
+    razorpayPaymentId: {
+        type: String
     }
 })
 

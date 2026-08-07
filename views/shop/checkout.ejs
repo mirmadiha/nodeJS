@@ -1,0 +1,65 @@
+<%- include('../includes/head.ejs') %>
+    <link rel="stylesheet" href="/css/cart.css">
+    </head>
+
+    <body>
+        <%- include('../includes/navigation.ejs') %>
+            <main>
+                <ul class="cart__item-list">
+                    <% products.forEach(p=> { %>
+                        <li class="cart__item">
+                            <h1>
+                                <%= p.productId.title %>
+                            </h1>
+                            <h2>Quantity: <%= p.quantity %>
+                            </h2>
+                        </li>
+                        <% }) %>
+                </ul>
+                <div class="centered">
+                    <h2>Total: <%= totalSum %>
+                    </h2>
+                </div>
+                <div class="centered">
+                    <button id="rzp-button" class="btn">Pay Now</button>
+                </div>
+            </main>
+            <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+            <script>
+                const options = {
+                    key: "<%= razorpayKeyId %>",
+                    amount: <%= totalSum * 100 %>,
+                    currency: "INR",
+                    name: "ShopSphere",
+                    description: "Order Payment",
+                    order_id: "<%= razorpayOrderId %>",
+
+                    handler: function (response) {
+                        fetch('/checkout/payment-success', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'CSRF-Token': '<%= csrfToken %>'
+                            },
+                            body: JSON.stringify(response)
+                        })
+                            .then(res => res.json())
+                            .then(data => {
+                                console.log(data);
+                                window.location.href = '/orders';
+                            });
+        },
+
+                theme: {
+                    color: "#3399cc"
+                }
+    };
+
+                const rzp = new Razorpay(options);
+
+                document.getElementById("rzp-button").onclick = function (e) {
+                    rzp.open();
+                    e.preventDefault();
+                };
+            </script>
+            <%- include('../includes/end.ejs') %>

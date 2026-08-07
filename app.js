@@ -60,6 +60,7 @@ const fileFilter = (req, file, cb) => {
 };
 
 app.use(bodyParser.urlencoded({ extended: false }));
+app.use(express.json());
 app.use(multer({ storage: fileStorage, fileFilter: fileFilter }).single('image'));
 
 app.use(express.static(path.join(__dirname, 'public')));
@@ -77,23 +78,49 @@ app.use((req, res, next) => {
     next();
 });
 
+// app.use((req, res, next) => {
+//     console.log("isLoggedIn:", req.session.isLoggedIn);
+//     console.log("session.user:", req.session.user);
+//     if (!req.session.user) {
+//         return next();
+//     }
+//     User.findById(req.session.user._id)
+//         .then(user => {
+//             if (!user) {
+//                 return next();
+//             }
+//             req.user = user;
+//             next();
+//         })
+//         .catch(err => {
+//             next(new Error(err));
+//         });
+// })
+
 app.use((req, res, next) => {
+    console.log("isLoggedIn:", req.session.isLoggedIn);
+    console.log("session.user:", req.session.user);
 
     if (!req.session.user) {
+        console.log("No session user");
         return next();
     }
+
     User.findById(req.session.user._id)
         .then(user => {
+            console.log("User from DB:", user);
+
             if (!user) {
+                console.log("User not found");
                 return next();
             }
+
             req.user = user;
+            console.log("req.user assigned");
             next();
         })
-        .catch(err => {
-            next(new Error(err));
-        });
-})
+        .catch(err => next(err));
+});
 
 app.use("/admin", adminRoutes);
 app.use(shopRoutes);
@@ -104,6 +131,7 @@ app.get('/500', errorControllers.get500);
 app.use(errorControllers.get404);
 
 app.use((error, req, res, next) => {
+    console.error(error);
     res.status(500).render("500", {
         pageTitle: 'Error',
         path: '/500',

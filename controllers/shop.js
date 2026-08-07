@@ -2,8 +2,11 @@ const fs = require('fs');
 const path = require('path');
 const Product = require('../models/product');
 const Order = require('../models/order');
+const Razorpay = require('razorpay');
+const crypto = require('crypto');
 
-const ITEMS_PER_PAGE = 1;
+
+const ITEMS_PER_PAGE = 3;
 
 const PDFDocument = require('pdfkit');
 
@@ -65,8 +68,7 @@ exports.getCart = ((req, res, next) => {
             res.render('shop/cart', {
                 path: '/cart',
                 pageTitle: "Your cart",
-                products: products,
-                isAuthenticated: req.session.isLoggedIn
+                products: products
             })
         })
         .catch(err => {
@@ -157,6 +159,42 @@ exports.postCartDeleteProduct = (req, res, next) => {
             error.httpStatusCode = 500;
             return next(error);
         })
+};
+
+exports.getCheckout = (req, res, next) => {
+    req.user
+        .populate('cart.items.productId')
+        .then(user => {
+            const products = user.cart.items;
+
+            let total = 0;
+            products.forEach(p => {
+                total += p.quantity * p.productId.price;
+            });
+
+            return razorpay.orders.create({
+                amount: total * 100, // Amount in paise
+                currency: "INR",
+                receipt: "receipt_" + Date.now()
+            })
+                .then(order => {
+                    console.log("Razorpay Order:", order);
+
+                    res.render("shop/checkout", {
+                        path: "/checkout",
+                        pageTitle: "Checkout",
+                        products: products,
+                        totalSum: total,
+                        razorpayOrderId: order.id,
+                        razorpayKeyId: process.env.RAZORPAY_KEY_ID
+                    });
+                });
+        })
+        .catch(err => {
+            const error = new Error(err);
+            error.httpStatusCode = 500;
+            return next(error);
+        });
 };
 
 exports.postOrder = (req, res, next) => {
@@ -296,5 +334,66 @@ exports.getInvoice = (req, res, next) => {
             return next(error);
         })
 }
+
+exports.postPaymentSuccess = (req, res, next) => {
+
+    const {
+        razorpay_order_id,
+        razorpay_payment_id,
+        razorpay_signature
+    } = req.body;
+
+    const body = razorpay_order_id + '|' + razorpay_payment_id;
+
+    const expectedSignature = crypto
+        .createHmac('sha256', process.env.RAZORPAY_KEY_SECRET)
+        .update(body.toString())
+        .digest('hex');
+
+    const isAuthentic = expectedSignature === razorpay_signature;
+
+    if (!isAuthentic) {
+        return res.status(400).json({ message: 'Payment verification failed' });
+    }
+
+    req.user
+        .populate('cart.items.productId')
+        .then(user => {
+            const products = user.cart.items.map(item => {
+                return {
+                    product: { ...item.productId._doc },
+                    quantity: item.quantity
+                };
+            });
+
+            const order = new Order({
+                products: products,
+                user: {
+                    email: req.user.email,
+                    userId: req.user._id
+                },
+                razorpayOrderId: razorpay_order_id,
+                razorpayPaymentId: razorpay_payment_id
+            });
+
+            return order.save();
+        })
+        .then(() => {
+            return req.user.clearCart();
+        })
+        .then(() => {
+            res.json({ message: 'Payment verified and order placed successfully' });
+        })
+        .catch(err => {
+            const error = new Error(err);
+            error.httpStatusCode = 500;
+            return next(error);
+        });
+};
+
+const razorpay = new Razorpay({
+    key_id: process.env.RAZORPAY_KEY_ID,
+    key_secret: process.env.RAZORPAY_KEY_SECRET
+});
 
 
