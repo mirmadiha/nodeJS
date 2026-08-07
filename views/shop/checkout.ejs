@@ -8,20 +8,19 @@
                 <ul class="cart__item-list">
                     <% products.forEach(p=> { %>
                         <li class="cart__item">
-                            <h1>
-                                <%= p.productId.title %>
-                            </h1>
-                            <h2>Quantity: <%= p.quantity %>
-                            </h2>
+                            <div class="cart__item-details">
+                                <h1>
+                                    <%= p.productId.title %>
+                                </h1>
+                                <h2>Quantity: <%= p.quantity %></h2>
+                            </div>
                         </li>
                         <% }) %>
                 </ul>
-                <div class="centered">
-                    <h2>Total: <%= totalSum %>
-                    </h2>
-                </div>
-                <div class="centered">
-                    <button id="rzp-button" class="btn">Pay Now</button>
+                <div class="checkout-summary">
+                    <h2>Order Summary</h2>
+                    <div class="checkout-summary__total">Total: Rs <%= totalSum %></div>
+                    <button id="rzp-button" class="btn btn--primary">Pay Now</button>
                 </div>
             </main>
             <script src="https://checkout.razorpay.com/v1/checkout.js"></script>

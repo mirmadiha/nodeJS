@@ -1,10 +1,40 @@
 require('dotenv').config();
 
-const http = require("http");
+// Validate required environment variables before booting
+const requiredEnvVars = [
+    'MONGODB_URI',
+    'SESSION_SECRET',
+    'RAZORPAY_KEY_ID',
+    'RAZORPAY_KEY_SECRET',
+    'SENDGRID_API_KEY',
+    'EMAIL_FROM',
+    'BASE_URL'
+];
+
+const missingEnvVars = requiredEnvVars.filter(envVar => !process.env[envVar]);
+
+if (missingEnvVars.length > 0) {
+    console.error('\x1b[31m%s\x1b[0m', 'CRITICAL ERROR: Missing required environment variables:');
+    missingEnvVars.forEach(envVar => {
+        console.error('\x1b[33m%s\x1b[0m', ` - ${envVar}`);
+    });
+    console.error('Please configure these variables in your .env file before starting the application.');
+    process.exit(1);
+}
+
+const https = require("https");
 
 const path = require("path");
 
 const express = require("express");
+
+const fs = require('fs');
+
+const helmet = require('helmet');
+
+const compression = require('compression');
+
+const morgan = require('morgan');
 
 const bodyParser = require("body-parser");
 
@@ -12,6 +42,21 @@ const errorControllers = require('./controllers/error');
 const User = require('./models/user');
 
 const app = express();
+
+const accessLogStream = fs.createWriteStream(
+    path.join(__dirname, 'access.log'),
+    { flags: 'a' }
+);
+
+app.use(morgan('combined', { stream: accessLogStream }));
+
+app.use(
+    helmet({
+        contentSecurityPolicy: false
+    })
+);
+
+app.use(compression());
 
 app.set("view engine", "ejs");
 app.set('views', 'views');
@@ -28,7 +73,7 @@ const multer = require('multer');
 
 
 
-const MONGODB_URI = 'mongodb+srv://mirmadihaaijaz_db_user:dbMadiha123@cluster0.xsaikfm.mongodb.net/shop';
+const MONGODB_URI = process.env.MONGODB_URI;
 
 
 const store = new MongoDBStore({
@@ -67,7 +112,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/images', express.static(path.join(__dirname, 'images')));
 
 app.use(
-    session({ secret: 'mysecret', resave: false, saveUninitialized: false, store: store })
+    session({ secret: process.env.SESSION_SECRET, resave: false, saveUninitialized: false, store: store })
 );
 
 app.use(csrfProtection);
@@ -140,10 +185,20 @@ app.use((error, req, res, next) => {
     });
 })
 
-mongoose.connect(
-    MONGODB_URI
-)
+mongoose.connect(MONGODB_URI)
     .then(result => {
-        app.listen(4000);
+
+        const sslOptions = {
+            key: fs.readFileSync('ssl/server.key'),
+            cert: fs.readFileSync('ssl/server.cert')
+        };
+
+        https.createServer(
+            sslOptions,
+            app
+        ).listen(process.env.PORT || 4000, () => {
+            console.log('HTTPS server running on port 4000');
+        });
+
     })
     .catch(err => console.log(err));

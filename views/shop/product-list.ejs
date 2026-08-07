@@ -19,7 +19,7 @@
                                     <img src="/<%= product.imageUrl %>" alt="<%= product.title %>">
                                 </div>
                                 <div class="card__content">
-                                    <h2 class="product__price">$
+                                    <h2 class="product__price">Rs
                                         <%= product.price %>
                                     </h2>
                                     <p class="product__description">
@@ -38,7 +38,11 @@
                     <%- include('../includes/pagination.ejs', {currentPage: currentPage, hasPrevPage: hasPrevPage,
                         prevPage: prevPage, hasNextPage: hasNextPage, nextPage: nextPage, lastPage: lastPage}) %>
                         <% } else { %>
-                            <h1>No Products Found!</h1>
+                            <div class="empty-state">
+                                <div class="empty-state__icon">🔍</div>
+                                <h2>No Products Found</h2>
+                                <p>We couldn't find any products in our store right now. Please check back later or add some products if you are logged in as admin.</p>
+                            </div>
                             <% } %>
             </main>
             <%- include('../includes/end.ejs') %>

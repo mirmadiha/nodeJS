@@ -65,6 +65,24 @@ exports.getCart = ((req, res, next) => {
         .populate('cart.items.productId')
         .then(user => {
             const products = user.cart.items;
+            // Filter out items with null/deleted products
+            const validProducts = products.filter(p => p.productId !== null);
+
+            // Clean up the user's cart in the DB if any products were deleted
+            if (validProducts.length !== products.length) {
+                user.cart.items = validProducts.map(p => ({
+                    productId: p.productId._id,
+                    quantity: p.quantity
+                }));
+                return user.save().then(() => {
+                    res.render('shop/cart', {
+                        path: '/cart',
+                        pageTitle: "Your cart",
+                        products: validProducts
+                    });
+                });
+            }
+
             res.render('shop/cart', {
                 path: '/cart',
                 pageTitle: "Your cart",
@@ -165,7 +183,11 @@ exports.getCheckout = (req, res, next) => {
     req.user
         .populate('cart.items.productId')
         .then(user => {
-            const products = user.cart.items;
+            // Filter out items with null/deleted products
+            const products = user.cart.items.filter(p => p.productId !== null);
+            if (products.length === 0) {
+                return res.redirect('/cart');
+            }
 
             let total = 0;
             products.forEach(p => {
@@ -198,16 +220,16 @@ exports.getCheckout = (req, res, next) => {
 };
 
 exports.postOrder = (req, res, next) => {
-    let fetchedCart;
     req.user.populate('cart.items.productId')
         .then(user => {
-            fetchedCart = user.cart.items;
-            const products = fetchedCart.map(item => {
+            // Filter out items with null/deleted products
+            const validItems = user.cart.items.filter(item => item.productId !== null);
+            const products = validItems.map(item => {
                 return {
                     product: { ...item.productId._doc },
                     quantity: item.quantity
                 }
-            })
+            });
 
             const order = new Order({
                 products: products,
@@ -298,20 +320,66 @@ exports.getInvoice = (req, res, next) => {
             pdfDoc.pipe(fs.createWriteStream(invoicePath));  //this ensures pdf getss stored on server and not just on client
             pdfDoc.pipe(res);
 
-            pdfDoc.fontSize(26).text('Invoice', {
-                underline: true
-            });
+            // Vector Logo Icon
+            pdfDoc.circle(66, 66, 14).lineWidth(2.5).strokeColor('#0f172a').opacity(0.1).stroke();
+            pdfDoc.opacity(1.0); // Reset opacity
+            
+            // Orbit Arc
+            pdfDoc.path('M66 52 A14 14 0 0 1 80 66 A14 14 0 0 1 73.5 77.5').strokeColor('#7C83FD').lineWidth(2.5).stroke();
+            
+            // Inner Stylized S
+            pdfDoc.moveTo(62, 62)
+                  .bezierCurveTo(62, 59.5, 70, 59.5, 70, 62)
+                  .bezierCurveTo(70, 64.5, 62, 65.5, 62, 68)
+                  .bezierCurveTo(62, 70.5, 70, 70.5, 70, 68)
+                  .strokeColor('#7C83FD').lineWidth(2.5).stroke();
 
-            pdfDoc.text('-------------------------')
+            // Wordmark Typography (next to icon)
+            pdfDoc.font('Helvetica-Bold').fontSize(16).fillColor('#0f172a').text('Shop', 92, 53, { continued: true });
+            pdfDoc.fillColor('#7C83FD').text('Sphere');
+            pdfDoc.font('Helvetica').fontSize(9).fillColor('#64748b').text('Kashmiri Handicrafts Marketplace', 92, 72);
 
+            // Right-aligned Invoice Title metadata
+            pdfDoc.font('Helvetica-Bold').fontSize(20).fillColor('#0f172a').text('INVOICE', 350, 50, { align: 'right', width: 210 });
+            pdfDoc.font('Helvetica').fontSize(9).fillColor('#64748b').text('Order ID: #' + order._id, 350, 75, { align: 'right', width: 210 });
+            
+            // Header Divider
+            pdfDoc.moveTo(50, 105).lineTo(560, 105).strokeColor('#e2e8f0').lineWidth(1).stroke();
+
+            // Table Columns Headers
+            pdfDoc.font('Helvetica-Bold').fontSize(10).fillColor('#0f172a').text('Item Description', 50, 130);
+            pdfDoc.text('Qty', 320, 130, { align: 'right', width: 30 });
+            pdfDoc.text('Unit Price', 380, 130, { align: 'right', width: 70 });
+            pdfDoc.text('Total', 480, 130, { align: 'right', width: 80 });
+
+            // Table Header Divider
+            pdfDoc.moveTo(50, 145).lineTo(560, 145).strokeColor('#cbd5e1').lineWidth(1).stroke();
+
+            let currentY = 165;
             let totalPrice = 0;
 
             order.products.forEach(prod => {
-                pdfDoc.fontSize(14).text(prod.product.title + ' - ' + prod.quantity + 'x' + '$' + prod.product.price);
-                totalPrice += prod.quantity * prod.product.price;
+                const itemTotal = prod.quantity * prod.product.price;
+                totalPrice += itemTotal;
+
+                pdfDoc.font('Helvetica').fontSize(10).fillColor('#334155').text(prod.product.title, 50, currentY, { width: 240, height: 20 });
+                pdfDoc.text(prod.quantity.toString(), 320, currentY, { align: 'right', width: 30 });
+                pdfDoc.text('Rs ' + prod.product.price.toFixed(2), 380, currentY, { align: 'right', width: 70 });
+                pdfDoc.text('Rs ' + itemTotal.toFixed(2), 480, currentY, { align: 'right', width: 80 });
+
+                currentY += 25;
             });
-            pdfDoc.text('-------------------------')
-            pdfDoc.fontSize(20).text('Total Price: $' + totalPrice);
+
+            // Table Footer Divider
+            pdfDoc.moveTo(50, currentY).lineTo(560, currentY).strokeColor('#cbd5e1').lineWidth(1).stroke();
+
+            // Total Amount Due Summary block
+            currentY += 15;
+            pdfDoc.font('Helvetica-Bold').fontSize(11).fillColor('#0f172a').text('Total Amount Due:', 350, currentY, { width: 120 });
+            pdfDoc.text('Rs ' + totalPrice.toFixed(2), 480, currentY, { align: 'right', width: 80 });
+
+            // Footer note supporting Kashmiri craftsmen
+            pdfDoc.font('Helvetica-Oblique').fontSize(8.5).fillColor('#64748b').text('Thank you for shopping with ShopSphere. Your purchase directly supports local Kashmiri artisans and weavers.', 50, 710, { align: 'center', width: 510 });
 
             pdfDoc.end();
             // fs.readFile(invoicePath, (err, data) => {
@@ -359,7 +427,9 @@ exports.postPaymentSuccess = (req, res, next) => {
     req.user
         .populate('cart.items.productId')
         .then(user => {
-            const products = user.cart.items.map(item => {
+            // Filter out items with null/deleted products
+            const validItems = user.cart.items.filter(item => item.productId !== null);
+            const products = validItems.map(item => {
                 return {
                     product: { ...item.productId._doc },
                     quantity: item.quantity

@@ -19,7 +19,7 @@
                                     <img src="/<%= product.imageUrl %>" alt="<%= product.title %>">
                                 </div>
                                 <div class="card__content">
-                                    <h2 class="product__price">$
+                                    <h2 class="product__price">Rs
                                         <%= product.price %>
                                     </h2>
                                     <p class="product__description">
@@ -31,7 +31,7 @@
 
                                     <input type="hidden" value="<%= product._id %>" name="productId">
                                     <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-                                    <button class="btn" type="button" onclick="deleteProduct(this)">Delete</button>
+                                    <button class="btn danger" type="button" onclick="deleteProduct(this)">Delete</button>
 
 
                                 </div>
@@ -39,7 +39,12 @@
                             <% } %>
                     </div>
                     <% } else { %>
-                        <h1>No Products Found!</h1>
+                        <div class="empty-state">
+                            <div class="empty-state__icon">📁</div>
+                            <h2>No Admin Products Found</h2>
+                            <p>You haven't uploaded any products to ShopSphere yet. Create one now to list it in your catalog.</p>
+                            <a href="/admin/add-product" class="btn">Add Product</a>
+                        </div>
                         <% } %>
             </main>
             <%- include('../includes/end.ejs') %>

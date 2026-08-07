@@ -24,11 +24,11 @@ exports.getLogin = (req, res, next) => {
         pageTitle: 'Login',
         isAuthenticated: false,
         errorMessage: message,
-        oldInput:{
+        oldInput: {
             email: '',
             password: ''
-         },
-         validationErrors: []
+        },
+        validationErrors: []
     });
 };
 
@@ -65,57 +65,57 @@ exports.postLogin = (req, res, next) => {
             pageTitle: 'Login',
             isAuthenticated: false,
             errorMessage: 'Invalid email or password!',
-            oldInput:{
+            oldInput: {
                 email: email,
                 password: password
-             },
-             validationErrors: errors.array()
+            },
+            validationErrors: errors.array()
         })
     }
 
     User.findOne({ email: email })
         .then(user => {
             if (!user) {
-            return res.status(422).render('auth/login', {
-            path: '/login',
-            pageTitle: 'Login',
-            isAuthenticated: false,
-            errorMessage: 'Invalid email or password!',
-            oldInput:{
-                email: email,
-                password: password
-             },
-             validationErrors: []
-        })
+                return res.status(422).render('auth/login', {
+                    path: '/login',
+                    pageTitle: 'Login',
+                    isAuthenticated: false,
+                    errorMessage: 'Invalid email or password!',
+                    oldInput: {
+                        email: email,
+                        password: password
+                    },
+                    validationErrors: []
+                })
             }
-        bcrypt
-        .compare(password, user.password)
-        .then(doMatch => {
-            if (doMatch) {
-                req.session.isLoggedIn = true;
-                req.session.user = user;
-                return req.session.save(err => {
+            bcrypt
+                .compare(password, user.password)
+                .then(doMatch => {
+                    if (doMatch) {
+                        req.session.isLoggedIn = true;
+                        req.session.user = user;
+                        return req.session.save(err => {
+                            console.log(err);
+                            res.redirect('/');
+                        });
+                    }
+                    return res.status(422).render('auth/login', {
+                        path: '/login',
+                        pageTitle: 'Login',
+                        isAuthenticated: false,
+                        errorMessage: 'Invalid email or password!',
+                        oldInput: {
+                            email: email,
+                            password: password
+                        },
+                        validationErrors: []
+                    })
+                })
+                .catch(err => {
                     console.log(err);
-                    res.redirect('/');
-                });
-            }
-        return res.status(422).render('auth/login', {
-            path: '/login',
-            pageTitle: 'Login',
-            isAuthenticated: false,
-            errorMessage: 'Invalid email or password!',
-            oldInput:{
-                email: email,
-                password: password
-             },
-             validationErrors: []
+                    res.redirect('/login');
+                })
         })
-        })
-        .catch(err => {
-            console.log(err);
-            res.redirect('/login');
-        })
-    })
         .catch(err => {
             const error = new Error(err);
             error.httpStatusCode = 500;
@@ -158,7 +158,7 @@ exports.postSignup = (req, res, next) => {
             res.redirect('/login');
             return transporter.sendMail({
                 to: email,
-                from: 'aijazmirmadiha@gmail.com',
+                from: process.env.EMAIL_FROM,
                 subject: 'Signup succeeded',
                 html: '<h1>You successfully signed up!</h1>'
             });
@@ -214,12 +214,12 @@ exports.postReset = (req, res, next) => {
             .then(result => {
                 return transporter.sendMail({
                     to: req.body.email,
-                    from: 'aijazmirmadiha@gmail.com',
+                    from: process.env.EMAIL_FROM,
                     subject: 'Reset Password',
                     html: `
                 <p>You requested a password reset</p>
                 <p>Click this link to reset your password:</p>
-                <a href="http://localhost:4000/new-password/${token}">Reset Password</a>
+                <a href="${process.env.BASE_URL}/new-password/${token}">Reset Password</a>
                 `
                 })
             })
@@ -227,10 +227,10 @@ exports.postReset = (req, res, next) => {
                 res.redirect('/');
             })
             .catch(err => {
-            const error = new Error(err);
-            error.httpStatusCode = 500;
-            return next(error);
-        })
+                const error = new Error(err);
+                error.httpStatusCode = 500;
+                return next(error);
+            })
     })
 }
 

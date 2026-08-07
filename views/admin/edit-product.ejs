@@ -11,65 +11,159 @@
                     <div class="user-message user-message--error">
                         <%= errorMessage %>
                     </div>
-                    <% } %>
+                <% } %>
+
+                <div class="admin-product-header">
+                    <h1><% if (editing) { %>Edit Product<% } else { %>Add New Product<% } %></h1>
+                    <p class="admin-product-subheader">
+                        <% if (editing) { %>Update product information and catalog details for the storefront.<% } else { %>List a new authentic Kashmiri handicraft product in the ShopSphere catalog.<% } %>
+                    </p>
+                </div>
+
+                <div class="admin-product-layout">
+                    <!-- Form Container (Left Column) -->
+                    <div class="admin-product-form-container">
                         <form class="product-form"
                             action="/admin/<% if (editing) { %>edit-product<% } else { %>add-product<% } %>"
                             method="POST"
                             enctype="multipart/form-data">
+                            
                             <div class="form-control">
-                                <label for="title">Title</label>
+                                <label for="title">Product Title</label>
                                 <input 
-                                class = "<%= validationErrors.find(e => e.path === 'title') ? 'invalid' : '' %>"
-                                type="text" 
-                                name="title" 
-                                id="title"
-                                value="<% if (editing || hasError) { %><%= product.title %><% } %>">
-                            </div>
-                            <!-- <div class="form-control">
-                                <label for="imageUrl">Image URL</label>
-                                <input 
-                                class = "<%= validationErrors.find(e => e.path === 'imageUrl') ? 'invalid' : '' %>"
-                                type="text" 
-                                name="imageUrl" 
-                                id="imageUrl"
-                                value="<% if (editing || hasError) { %><%= product.imageUrl %><% } %>">
-                            </div> -->
-
-                            <div class="form-control">
-                                <label for="image">Image</label>
-                                <input 
-                                class = "<%= validationErrors.find(e => e.path === 'imageUrl') ? 'invalid' : '' %>"
-                                type="file" 
-                                name="image" 
-                                id="image">
+                                    class="<%= validationErrors.find(e => e.path === 'title') ? 'invalid' : '' %>"
+                                    type="text" 
+                                    name="title" 
+                                    id="title"
+                                    placeholder="e.g. Handcrafted Kashmiri Walnut Wood Bowl"
+                                    value="<% if (editing || hasError) { %><%= product.title %><% } %>">
                             </div>
 
                             <div class="form-control">
-                                <label for="price">Price</label>
-                                <input 
-                                class = "<%= validationErrors.find(e => e.path === 'price') ? 'invalid' : '' %>"
-                                type="number" 
-                                name="price" 
-                                id="price" 
-                                step="0.01"
-                                value="<% if (editing || hasError) { %><%= product.price %><% } %>">
+                                <label for="image">Product Image File</label>
+                                <div class="file-upload-wrapper">
+                                    <input 
+                                        class="<%= validationErrors.find(e => e.path === 'imageUrl') ? 'invalid' : '' %>"
+                                        type="file" 
+                                        name="image" 
+                                        id="image">
+                                    <div class="file-upload-custom">
+                                        <span class="file-upload-icon">📷</span>
+                                        <span class="file-upload-text">Choose image file...</span>
+                                    </div>
+                                </div>
                             </div>
+
                             <div class="form-control">
-                                <label for="description">Description</label>
+                                <label for="price">Price (Rs)</label>
+                                <input 
+                                    class="<%= validationErrors.find(e => e.path === 'price') ? 'invalid' : '' %>"
+                                    type="number" 
+                                    name="price" 
+                                    id="price" 
+                                    step="0.01"
+                                    placeholder="e.g. 2499.00"
+                                    value="<% if (editing || hasError) { %><%= product.price %><% } %>">
+                            </div>
+
+                            <div class="form-control">
+                                <label for="description">Detailed Description</label>
                                 <textarea 
-                                class = "<%= validationErrors.find(e => e.path === 'description') ? 'invalid' : '' %>"
-                                name="description" 
-                                id="description"
-                                rows="5"><% if (editing || hasError) { %><%= product.description %><% } %></textarea>
+                                    class="<%= validationErrors.find(e => e.path === 'description') ? 'invalid' : '' %>"
+                                    name="description" 
+                                    id="description"
+                                    rows="5"
+                                    placeholder="Explain the craftsmanship, dimensions, and materials..."
+                                    ><% if (editing || hasError) { %><%= product.description %><% } %></textarea>
                             </div>
+
                             <% if (editing) { %>
                                 <input type="hidden" value="<%= product._id %>" name="productId">
-                                <% } %>
+                            <% } %>
 
-                                    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-                                    <button class="btn" type="submit">
-                                        <% if (editing) { %>Update Product<% } else { %>Add Product<% } %>
-                                    </button>
+                            <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                            <button class="btn btn--primary btn--large" type="submit">
+                                <% if (editing) { %>Update Product<% } else { %>Add Product<% } %>
+                            </button>
                         </form>
+                    </div>
+
+                    <!-- Live Preview Panel (Right Column) -->
+                    <div class="admin-product-preview-container">
+                        <div class="preview-card">
+                            <h2 class="preview-card__header">Live Preview</h2>
+                            
+                            <div class="preview-card__box card product-item">
+                                <div class="preview-card__image-container">
+                                    <img id="preview-image" src="<% if (editing) { %>/<%= product.imageUrl %><% } else { %>data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'><rect width='100%' height='100%' fill='%23f1f5f9'/><text x='50%' y='50%' dominant-baseline='middle' text-anchor='middle' font-family='system-ui' font-size='10' fill='%2394a3b8'>No Image</text></svg><% } %>" alt="Product Image Preview" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'100\' height=\'100\' viewBox=\'0 0 100 100\'><rect width=\'100%\' height=\'100%\' fill=\'%23f1f5f9\'/><text x=\'50%\' y=\'50%\' dominant-baseline=\'middle\' text-anchor=\'middle\' font-family=\'system-ui\' font-size=\'10\' fill=\'%2394a3b8\'>No Image</text></svg>';">
+                                </div>
+                                <div class="preview-card__details">
+                                    <h3 id="preview-title" class="preview-card__title">
+                                        <% if (editing || hasError) { %><%= product.title %><% } else { %>Product Title<% } %>
+                                    </h3>
+                                    <div id="preview-price" class="preview-card__price">
+                                        Rs <% if (editing || hasError) { %><%= product.price %><% } else { %>0.00<% } %>
+                                    </div>
+                                    <p id="preview-desc" class="preview-card__desc">
+                                        <% if (editing || hasError) { %><%= product.description %><% } else { %>Product description and details will appear here as you type...<% } %>
+                                    </p>
+                                </div>
+                            </div>
+                            
+                            <div class="preview-card__info-box">
+                                <h4>Artisan Guidelines</h4>
+                                <ul>
+                                    <li>Provide descriptive titles reflecting Kashmiri heritage.</li>
+                                    <li>Upload clear, high-resolution PNG or JPG photos of the item.</li>
+                                    <li>Set realistic pricing reflecting the craftsmanship hours.</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </main>
+
+            <script>
+                // Live preview updates
+                const titleInput = document.getElementById('title');
+                const priceInput = document.getElementById('price');
+                const descInput = document.getElementById('description');
+                const imageInput = document.getElementById('image');
+
+                const previewTitle = document.getElementById('preview-title');
+                const previewPrice = document.getElementById('preview-price');
+                const previewDesc = document.getElementById('preview-desc');
+                const previewImage = document.getElementById('preview-image');
+
+                titleInput.addEventListener('input', (e) => {
+                    previewTitle.textContent = e.target.value.trim() || 'Product Title';
+                });
+
+                priceInput.addEventListener('input', (e) => {
+                    const price = parseFloat(e.target.value) || 0;
+                    previewPrice.textContent = `Rs ${price.toFixed(2)}`;
+                });
+
+                descInput.addEventListener('input', (e) => {
+                    previewDesc.textContent = e.target.value.trim() || 'Product description and details will appear here as you type...';
+                });
+
+                imageInput.addEventListener('change', (e) => {
+                    const file = e.target.files[0];
+                    if (file) {
+                        const reader = new FileReader();
+                        reader.onload = function(event) {
+                            previewImage.src = event.target.result;
+                        };
+                        reader.readAsDataURL(file);
+                        
+                        // Update custom file upload text
+                        const fileName = file.name;
+                        const labelSpan = document.querySelector('.file-upload-text');
+                        if (labelSpan) {
+                            labelSpan.textContent = fileName;
+                        }
+                    }
+                });
+            </script>
             <%- include('../includes/end.ejs') %>

@@ -3,7 +3,13 @@
 
 <body>
     <%- include('includes/navigation.ejs') %>
-    <h1>Some Error Occurred</h1>
-    <p>We're working on fixing this, sorry for the inconvenience</p>
+    <main class="centered">
+        <div style="margin: 4rem auto; max-width: 30rem; padding: 3rem 2rem; background: var(--bg-card); border-radius: var(--radius-lg); border: 1px solid var(--border-color); box-shadow: var(--shadow-md);">
+            <div style="font-size: 5rem; font-weight: 800; color: var(--error-text); line-height: 1; margin-bottom: 1rem;">500</div>
+            <h1 style="font-size: 1.6rem; margin-bottom: 0.75rem;">Some Error Occurred</h1>
+            <p style="color: var(--text-muted); margin-bottom: 2rem; font-size: 0.95rem;">We are working on fixing this issue. Sorry for the inconvenience!</p>
+            <a href="/" class="btn" style="background-color: var(--primary); color: white; border: none; padding: 0.75rem 1.5rem; font-size: 0.95rem;">Go to Home</a>
+        </div>
+    </main>
 
 <%- include('includes/end.ejs') %>

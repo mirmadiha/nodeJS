@@ -7,7 +7,18 @@
 
             <main>
                 <% if (prods.length> 0) { %>
-                    <div class="grid">
+                    <% if (currentPage === 1) { %>
+                    <header class="hero">
+                        <div class="hero__content">
+                            <h1 class="hero__title">Authentic Kashmiri Handicrafts</h1>
+                            <p class="hero__subtitle">Discover handcrafted Pashmina shawls, walnut wood carvings, papier-mâché art, copperware, Namdas and timeless creations made by skilled artisans from Kashmir.</p>
+                            <div class="hero__actions">
+                                <a href="#catalog" class="btn btn--primary">Explore Collection</a>
+                            </div>
+                        </div>
+                    </header>
+                    <% } %>
+                    <div id="catalog" class="grid">
                         <% for (let product of prods) { %>
                             <article class="card product-item">
                                 <header class="card__header">
@@ -19,7 +30,7 @@
                                     <img src="/<%= product.imageUrl %>" alt="<%= product.title %>">
                                 </div>
                                 <div class="card__content">
-                                    <h2 class="product__price">$<%= product.price %>
+                                    <h2 class="product__price">Rs <%= product.price %>
                                     </h2>
                                     <p class="product__description">
                                         <%= product.description %>
@@ -36,8 +47,33 @@
                     </div>
                     <%- include('../includes/pagination.ejs', {currentPage: currentPage, hasPrevPage: hasPrevPage,
                         prevPage: prevPage, hasNextPage: hasNextPage, nextPage: nextPage, lastPage: lastPage}) %>
+
+                    <section class="testimonials">
+                        <h2 class="testimonials__title">Artisan Appreciations</h2>
+                        <div class="testimonials__grid">
+                            <div class="testimonial-card">
+                                <div class="testimonial-card__stars">★★★★★</div>
+                                <p class="testimonial-card__text">"The craftsmanship is exceptional. The walnut wood carving exceeded my expectations."</p>
+                                <div class="testimonial-card__author">— Sarah M.</div>
+                            </div>
+                            <div class="testimonial-card">
+                                <div class="testimonial-card__stars">★★★★★</div>
+                                <p class="testimonial-card__text">"Beautiful packaging and authentic products. I would definitely recommend ShopSphere."</p>
+                                <div class="testimonial-card__author">— Ahmed K.</div>
+                            </div>
+                            <div class="testimonial-card">
+                                <div class="testimonial-card__stars">★★★★★</div>
+                                <p class="testimonial-card__text">"My Pashmina shawl is incredibly soft and beautifully handcrafted."</p>
+                                <div class="testimonial-card__author">— Priya R.</div>
+                            </div>
+                        </div>
+                    </section>
                         <% } else { %>
-                            <h1>No Products Found!</h1>
+                            <div class="empty-state">
+                                <div class="empty-state__icon">🔍</div>
+                                <h2>No Products Found</h2>
+                                <p>We couldn't find any products in our store right now. Please check back later or add some products if you are logged in as admin.</p>
+                            </div>
                             <% } %>
             </main>
             <%- include('../includes/end.ejs') %>
