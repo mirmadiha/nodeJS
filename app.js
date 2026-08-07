@@ -186,19 +186,7 @@ app.use((error, req, res, next) => {
 })
 
 mongoose.connect(MONGODB_URI)
-    .then(result => {
-
-        const sslOptions = {
-            key: fs.readFileSync('ssl/server.key'),
-            cert: fs.readFileSync('ssl/server.cert')
-        };
-
-        https.createServer(
-            sslOptions,
-            app
-        ).listen(process.env.PORT || 4000, () => {
-            console.log('HTTPS server running on port 4000');
-        });
-
+    .then(() => {
+        app.listen(process.env.PORT || 4000);
     })
     .catch(err => console.log(err));
