@@ -1,26 +1,56 @@
 <%- include('../includes/head.ejs') %>
-    <link rel="stylesheet" href="/css/cart.css">
+    <link rel="stylesheet" href="/css/checkout.css">
     </head>
 
     <body>
         <%- include('../includes/navigation.ejs') %>
             <main>
-                <ul class="cart__item-list">
-                    <% products.forEach(p=> { %>
-                        <li class="cart__item">
-                            <div class="cart__item-details">
-                                <h1>
-                                    <%= p.productId.title %>
-                                </h1>
-                                <h2>Quantity: <%= p.quantity %></h2>
+                <div class="checkout-header">
+                    <h1>Checkout</h1>
+                    <p>Review your items and complete your purchase.</p>
+                </div>
+
+                <div class="checkout-container">
+                    <!-- LEFT COLUMN: Order Items -->
+                    <div class="checkout-left">
+                        <h2 class="section-title">Order Items</h2>
+                        <div class="checkout-items">
+                            <% products.forEach(p => { %>
+                                <div class="checkout-item">
+                                    <div class="checkout-item__image">
+                                        <img src="/<%= p.productId.imageUrl %>" alt="<%= p.productId.title %>">
+                                    </div>
+                                    <div class="checkout-item__details">
+                                        <h3><%= p.productId.title %></h3>
+                                        <p class="checkout-item__qty">Quantity: <%= p.quantity %></p>
+                                        <p class="checkout-item__price">Rs <%= p.productId.price %></p>
+                                    </div>
+                                </div>
+                            <% }) %>
+                        </div>
+                    </div>
+
+                    <!-- RIGHT COLUMN: Order Summary -->
+                    <div class="checkout-right">
+                        <div class="summary-card">
+                            <h2>Order Summary</h2>
+                            <div class="summary-divider"></div>
+                            <div class="summary-row">
+                                <span>Items (<%= products.reduce((acc, p) => acc + p.quantity, 0) %>)</span>
+                                <span>Rs <%= totalSum %></span>
                             </div>
-                        </li>
-                        <% }) %>
-                </ul>
-                <div class="checkout-summary">
-                    <h2>Order Summary</h2>
-                    <div class="checkout-summary__total">Total: Rs <%= totalSum %></div>
-                    <button id="rzp-button" class="btn btn--primary">Pay Now</button>
+                            <div class="summary-row">
+                                <span>Shipping</span>
+                                <span class="free-shipping">FREE</span>
+                            </div>
+                            <div class="summary-divider"></div>
+                            <div class="summary-row summary-row--total">
+                                <span>Total Due</span>
+                                <span class="total-price">Rs <%= totalSum %></span>
+                            </div>
+                            <button id="rzp-button" class="btn btn--primary checkout-btn">Pay Now</button>
+                        </div>
+                    </div>
                 </div>
             </main>
             <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
@@ -47,12 +77,12 @@
                                 console.log(data);
                                 window.location.href = '/orders';
                             });
-        },
+                    },
 
-                theme: {
-                    color: "#3399cc"
-                }
-    };
+                    theme: {
+                        color: "#7C83FD"
+                    }
+                };
 
                 const rzp = new Razorpay(options);
 

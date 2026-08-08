@@ -5,40 +5,62 @@
     <body>
         <%- include('../includes/navigation.ejs') %>
             <main>
-                <% if (products.length> 0) { %>
-                    <ul class="cart__item-list">
-                        <% products.forEach(p=> { %>
-                            <li class="cart__item">
-                                <div class="cart__item-details">
-                                    <h1>
-                                        <%= p.productId.title %>
-                                    </h1>
-                                    <h2>Quantity: <%= p.quantity %></h2>
-                                </div>
-                                <form action="/cart-delete-item" method="POST">
-                                    <input type="hidden" value="<%= p.productId._id %>" name="productId">
-                                    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-                                    <button class="btn danger" type="submit">Delete</button>
-                                </form>
-                            </li>
-                            <% }) %>
-                    </ul>
-                    <hr>
-                    <div class="centered">
-                        <!--<form action="/create-order" method="POST">
-                        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-                        <button type="submit" class="btn">Order Now!</button>
-                    </form>-->
-                        <a href="/checkout" class="btn btn--primary">Order Now!</a>
-                    </div>
+                <div class="cart-header">
+                    <h1>Shopping Cart</h1>
+                    <p>Review your items before placing your order.</p>
+                </div>
 
-                    <% } else { %>
-                        <div class="empty-state">
-                            <div class="empty-state__icon">🛒</div>
-                            <h2>Your Cart is Empty</h2>
-                            <p>Looks like you haven't added anything to your shopping cart yet. Browse our products page to find the best deals!</p>
-                            <a href="/" class="btn">Start Shopping</a>
+                <% if (products.length > 0) { %>
+                    <div class="cart-container">
+                        <!-- LEFT COLUMN: Cart Items -->
+                        <div class="cart-left">
+                            <h2 class="section-title">Your Items</h2>
+                            <div class="cart-items">
+                                <% products.forEach(p => { %>
+                                    <div class="cart-item">
+                                        <div class="cart-item__image">
+                                            <img src="/<%= p.productId.imageUrl %>" alt="<%= p.productId.title %>">
+                                        </div>
+                                        <div class="cart-item__details">
+                                            <div class="cart-item__meta">
+                                                <h3><%= p.productId.title %></h3>
+                                                <p class="cart-item__price">Rs <%= p.productId.price %></p>
+                                                <span class="cart-item__qty">Qty: <%= p.quantity %></span>
+                                            </div>
+                                            <div class="cart-item__actions">
+                                                <form action="/cart-delete-item" method="POST">
+                                                    <input type="hidden" value="<%= p.productId._id %>" name="productId">
+                                                    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                                                    <button class="btn btn--danger-outline" type="submit">Delete</button>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                <% }) %>
+                            </div>
                         </div>
-                        <% } %>
+
+                        <!-- RIGHT COLUMN: Cart Summary -->
+                        <div class="cart-right">
+                            <div class="summary-card">
+                                <h2>Cart Summary</h2>
+                                <div class="summary-divider"></div>
+                                <div class="summary-row">
+                                    <span>Items</span>
+                                    <span><%= products.reduce((acc, p) => acc + p.quantity, 0) %></span>
+                                </div>
+                                <div class="summary-divider"></div>
+                                <a href="/checkout" class="btn btn--primary cart-btn">Order Now!</a>
+                            </div>
+                        </div>
+                    </div>
+                <% } else { %>
+                    <div class="empty-state">
+                        <div class="empty-state__icon">🛒</div>
+                        <h2>Your Cart is Empty</h2>
+                        <p>Looks like you haven't added anything to your shopping cart yet. Browse our products page to find the best deals!</p>
+                        <a href="/" class="btn">Start Shopping</a>
+                    </div>
+                <% } %>
             </main>
             <%- include('../includes/end.ejs') %>
